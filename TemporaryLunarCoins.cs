@@ -20,6 +20,7 @@ namespace TemporaryLunarCoins
     public class TemporaryLunarCoins : BaseUnityPlugin
     {
         bool AllAgree = false;
+        bool LoadingFromSave = false;
         static List<SteamPlayer> SteamPlayers = new List<SteamPlayer>();
 
         private static ConfigEntry<bool> ChangeDroprate;
@@ -35,15 +36,21 @@ namespace TemporaryLunarCoins
 
             On.RoR2.Run.Start += Run_Start;
 
-            On.RoR2.Chat.UserChatMessage.ConstructChatString += UserChatMessage_ConstructChatString;
-
-            //Taken from LoonerCoins
-            BindingFlags allFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            var initDelegate = typeof(PlayerCharacterMasterController).GetNestedTypes(allFlags)[0].GetMethodCached(name: "<Init>b__61_0");
+            if (!LoadingFromSave)
+            {
+                On.RoR2.Chat.UserChatMessage.ConstructChatString += UserChatMessage_ConstructChatString;
+            }
 
             if (ChangeDroprate.Value)
             {
-                MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Modify(initDelegate, (Action<ILContext>)coinDropHook);
+                if (!LoadingFromSave)
+                {
+                    //Taken from LoonerCoins
+                    BindingFlags allFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+                    var initDelegate = typeof(PlayerCharacterMasterController).GetNestedTypes(allFlags)[0].GetMethodCached(name: "<Init>b__61_0");
+
+                    MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Modify(initDelegate, (Action<ILContext>)coinDropHook);
+                }
                 On.RoR2.PlayerCharacterMasterController.Awake += PlayerCharacterMasterController_Awake;
             }
 
@@ -58,9 +65,17 @@ namespace TemporaryLunarCoins
         private void Run_Start(On.RoR2.Run.orig_Start orig, Run self)
         {
             orig(self);
-            AllAgree = false;
-            SteamPlayers = PopulateSteamPlayersList();
-            StartCoroutine(StartCoinRemovalAgreement());
+            Chat.AddMessage("Stages cleared: " + self.NetworkstageClearCount);
+            if (self.NetworkstageClearCount <= 0)
+            {
+                AllAgree = false;
+                SteamPlayers = PopulateSteamPlayersList();
+                StartCoroutine(StartCoinRemovalAgreement());
+            }
+            else
+            {
+                LoadingFromSave = true;
+            }
         }
 
         private List<SteamPlayer> PopulateSteamPlayersList()
