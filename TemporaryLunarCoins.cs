@@ -42,16 +42,18 @@ namespace TemporaryLunarCoins
                 On.RoR2.Chat.UserChatMessage.ConstructChatString += UserChatMessage_ConstructChatString;
             }
 
+            // save files need to store the current amount of coins they had and the current drop rate is
+            // could also possibly calculate the current drop rate if the number of total coins gained that run is available
             if (ChangeDroprate.Value)
             {
-                if (!LoadingFromSave)
-                {
-                    //Taken from LoonerCoins
-                    BindingFlags allFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-                    var initDelegate = typeof(PlayerCharacterMasterController).GetNestedTypes(allFlags)[0].GetMethodCached(name: "<Init>b__61_0");
+                // Taken from LoonerCoins
+                BindingFlags allFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+                var initDelegate = typeof(PlayerCharacterMasterController).GetNestedTypes(allFlags)[0].GetMethodCached(name: "<Init>b__61_0");
 
-                    MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Modify(initDelegate, (Action<ILContext>)coinDropHook);
-                }
+                // modifies the lunar coin drop rate; needs to be disabled when loading if the save stores this instead
+                MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Modify(initDelegate, (Action<ILContext>)coinDropHook);
+
+                // modifies the drop rate multiplier; this will always be changed by TLC, so there's no point in storing it in the save file
                 On.RoR2.PlayerCharacterMasterController.Awake += PlayerCharacterMasterController_Awake;
             }
 
@@ -67,7 +69,7 @@ namespace TemporaryLunarCoins
         {
             orig(self);
             Chat.AddMessage("Stages cleared: " + self.NetworkstageClearCount);
-            if (self.NetworkstageClearCount <= 0)
+            if (self.NetworkstageClearCount <= 0) // checking if this is a loaded game or not
             {
                 AllAgree = false;
                 SteamPlayers = PopulateSteamPlayersList();
@@ -134,15 +136,15 @@ namespace TemporaryLunarCoins
         {
             var c = new ILCursor(il);
 
-            //This doesn't actually change the lunarCoinChanceMultiplier, but it does influence it
-            //c.GotoNext(
-            //    x => x.MatchLdcR4(1f),
-            //    x => x.MatchLdloc(out _),
-            //    x => x.MatchLdfld<PlayerCharacterMasterController>("lunarCoinChanceMultiplier"),
-            //    x => x.MatchMul(),
-            //    x => x.MatchLdcR4(0f)
-            //);
-            //c.Next.Operand = DropChance.Value;
+            // This doesn't actually change the lunarCoinChanceMultiplier, but it does influence it
+            // c.GotoNext(
+            //     x => x.MatchLdcR4(1f),
+            //     x => x.MatchLdloc(out _),
+            //     x => x.MatchLdfld<PlayerCharacterMasterController>("lunarCoinChanceMultiplier"),
+            //     x => x.MatchMul(),
+            //     x => x.MatchLdcR4(0f)
+            // );
+            // c.Next.Operand = DropChance.Value;
 
 
             c.GotoNext(
@@ -153,7 +155,7 @@ namespace TemporaryLunarCoins
                 );
             c.Index += 2;
             c.Next.Operand = DropMulti.Value;
-            //Debug.Log(il);
+            // Debug.Log(il);
         }
 
 
