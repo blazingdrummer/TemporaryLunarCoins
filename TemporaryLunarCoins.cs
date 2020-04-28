@@ -16,7 +16,8 @@ using Random = System.Random;
 namespace TemporaryLunarCoins
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.MagnusMagnuson.TemporaryLunarCoins", "TemporaryLunarCoins", "0.2.0")]
+    [BepInDependency("com.KingEnderBrine.ProperSave", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInPlugin("com.blazingdrummer.TemporaryLunarCoins", "TemporaryLunarCoins", "0.2.0")]
     public class TemporaryLunarCoins : BaseUnityPlugin
     {
         bool AllAgree = false;
