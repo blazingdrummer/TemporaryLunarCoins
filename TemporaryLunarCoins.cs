@@ -146,12 +146,15 @@ namespace blazingdrummer.TemporaryLunarCoins
 
         private void UnfreezePlayers()
         {
+            Time.timeScale = 1f;
+            /*
             foreach (var p in PlayerCharacterMasterController.instances)
             {
                 p.master.GetBody().gameObject.GetComponent<SetStateOnHurt>().SetFrozen(0.1f);
                 p.master.GetBody().RemoveBuff(BuffIndex.HiddenInvincibility);
                 p.master.GetBody().AddTimedBuff(BuffIndex.HiddenInvincibility, 3f);
             }
+            */
         }
 
         private void RemoveLunarCoins()
@@ -165,12 +168,13 @@ namespace blazingdrummer.TemporaryLunarCoins
         public IEnumerator StartCoinRemovalAgreement()
         {
             yield return new WaitForSeconds(7f);
-            // Time.timeScale = 0f;
+            Time.timeScale = 0f;
             Chat.SendBroadcastChat(new Chat.SimpleChatMessage
             {
                 baseToken = " -- Temporary Lunar Coins --" +
-                "\n<size=15px>If you wish to participate in this run, you need to agree to have your lunar coins reset. Type <color=#00cc00>\"tlc_aye\"</color> in the chat if you agree. Otherwise leave the game and keep your coins. The game will resume once everyone present agreed.</size>"
+                "\n<size=15px>If you wish to participate in this run, you need to agree to have your lunar coins reset to 0. Type <color=#00cc00>\"AGREE\"</color> in the chat if you agree. Otherwise, leave the game and keep your coins. The game will resume once everyone present agrees.</size>"
             });
+            /*
             foreach (var p in PlayerCharacterMasterController.instances)
             {
                 var state = p.master.GetBody().gameObject.GetComponent<SetStateOnHurt>();
@@ -190,6 +194,7 @@ namespace blazingdrummer.TemporaryLunarCoins
                 }
                 yield return new WaitForSeconds(1f);
             }
+            */
 
 
         }
