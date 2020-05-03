@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemporaryLunarCoins", "TemporaryLunarCoins.csproj", "{1314AE5C-10CB-4B55-9A0A-E800E46CF1FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemporaryLunarCoins", "TemporaryLunarCoins.csproj", "{982E3605-4C48-44E9-9A2E-BDD6C76DE4D6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D3E3335C-52E6-49F1-A1D4-788ADDDB4987}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +16,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1314AE5C-10CB-4B55-9A0A-E800E46CF1FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1314AE5C-10CB-4B55-9A0A-E800E46CF1FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1314AE5C-10CB-4B55-9A0A-E800E46CF1FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1314AE5C-10CB-4B55-9A0A-E800E46CF1FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{982E3605-4C48-44E9-9A2E-BDD6C76DE4D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{982E3605-4C48-44E9-9A2E-BDD6C76DE4D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{982E3605-4C48-44E9-9A2E-BDD6C76DE4D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{982E3605-4C48-44E9-9A2E-BDD6C76DE4D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {8894EA66-EB34-416B-B51C-3D502476EB7F}
+		SolutionGuid = {23DB91DB-575B-41C4-AEC7-4A9928224F66}
 	EndGlobalSection
 EndGlobal
