@@ -52,7 +52,7 @@ namespace blazingdrummer.TemporaryLunarCoins
             };
 
             // save file stores run's current coin amount and multiplier value
-            // TODO: the actual drop value is not currently stored!
+            // initial drop chance is the initial value of lunarCoinChanceMultiplier and the actual "multiplier" is hard-coded
             if (!LoadingFromSave)
             {
                 On.RoR2.Chat.UserChatMessage.ConstructChatString += UserChatMessage_ConstructChatString;
