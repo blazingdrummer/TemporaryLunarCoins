@@ -50,20 +50,25 @@ namespace blazingdrummer.TemporaryLunarCoins
                     LoadingFromSave = true;
                 }
             };
-
-            // save file stores run's current coin amount and multiplier value
-            // initial drop chance is the initial value of lunarCoinChanceMultiplier and the actual "multiplier" is hard-coded
+            
             if (!LoadingFromSave)
             {
                 On.RoR2.Chat.UserChatMessage.ConstructChatString += UserChatMessage_ConstructChatString;
+            }
 
-                if (ChangeDroprate.Value)
+            // save file stores run's current coin amount and multiplier value
+            // initial drop chance is the initial value of lunarCoinChanceMultiplier and the actual "multiplier" is hard-coded
+            if (ChangeDroprate.Value)
+            {
+                // the IL edit to the hard-coded multiplier needs to happen every time, regardless of loading from save
+                // Taken from LoonerCoins
+                BindingFlags allFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+                var initDelegate = typeof(PlayerCharacterMasterController).GetNestedTypes(allFlags)[0].GetMethodCached(name: "<Init>b__61_0");
+                MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Modify(initDelegate, (Action<ILContext>)coinDropHook);
+
+                // the drop chance should not be set back to the config value in the case of a loaded save
+                if (!LoadingFromSave)
                 {
-                    // Taken from LoonerCoins
-                    BindingFlags allFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-                    var initDelegate = typeof(PlayerCharacterMasterController).GetNestedTypes(allFlags)[0].GetMethodCached(name: "<Init>b__61_0");
-                    MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Modify(initDelegate, (Action<ILContext>)coinDropHook);
-
                     On.RoR2.PlayerCharacterMasterController.Awake += PlayerCharacterMasterController_Awake;
                 }
             }
