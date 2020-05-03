@@ -64,4 +64,8 @@
     </Reference>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /Y &quot;$(TargetPath)&quot; &quot;C:\Users\Matthew Strobel\AppData\Roaming\r2modmanPlus-local\mods\profiles\Default\BepInEx\plugins\TemporaryLunarCoins.dll&quot;" />
+  </Target>
+
 </Project>

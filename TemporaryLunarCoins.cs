@@ -60,12 +60,10 @@ namespace blazingdrummer.TemporaryLunarCoins
                 if (ChangeDroprate.Value)
                 {
                     // Taken from LoonerCoins
-                    // modifies the lunar coin drop rate
                     BindingFlags allFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
                     var initDelegate = typeof(PlayerCharacterMasterController).GetNestedTypes(allFlags)[0].GetMethodCached(name: "<Init>b__61_0");
                     MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Modify(initDelegate, (Action<ILContext>)coinDropHook);
 
-                    // modifies the drop rate multiplier
                     On.RoR2.PlayerCharacterMasterController.Awake += PlayerCharacterMasterController_Awake;
                 }
             }
@@ -74,6 +72,7 @@ namespace blazingdrummer.TemporaryLunarCoins
         private void PlayerCharacterMasterController_Awake(On.RoR2.PlayerCharacterMasterController.orig_Awake orig, PlayerCharacterMasterController self)
         {
             orig(self);
+            // this sets the initial drop value; overrides the initial value of 0.5f set in PlayerCharacterMasterController()
             self.SetFieldValue("lunarCoinChanceMultiplier", DropChance.Value);
         }
 
@@ -90,7 +89,7 @@ namespace blazingdrummer.TemporaryLunarCoins
 
         private string UserChatMessage_ConstructChatString(On.RoR2.Chat.UserChatMessage.orig_ConstructChatString orig, Chat.UserChatMessage self)
         {
-            if (!AllAgree && self.text.ToLower().Equals("tlc_aye"))
+            if (!AllAgree && self.text.ToLower().Equals("agree"))
             {
                 NetworkUser networkUser = self.sender.GetComponent<NetworkUser>();
                 if (networkUser)
@@ -128,20 +127,10 @@ namespace blazingdrummer.TemporaryLunarCoins
 
 
         // Taken from LoonerCoins by Paddywaan
+        // this section modifies the multiplier through IL; replaces the initial value of 0.5f in PlayerCharacterMasterController.Init()
         private void coinDropHook(ILContext il)
         {
             var c = new ILCursor(il);
-
-            // This doesn't actually change the lunarCoinChanceMultiplier, but it does influence it
-            // c.GotoNext(
-            //     x => x.MatchLdcR4(1f),
-            //     x => x.MatchLdloc(out _),
-            //     x => x.MatchLdfld<PlayerCharacterMasterController>("lunarCoinChanceMultiplier"),
-            //     x => x.MatchMul(),
-            //     x => x.MatchLdcR4(0f)
-            // );
-            // c.Next.Operand = DropChance.Value;
-
 
             c.GotoNext(
                 x => x.MatchDup(),
