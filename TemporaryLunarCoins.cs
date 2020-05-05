@@ -1,17 +1,17 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using MonoMod.Cil;
-using R2API;
+//using R2API;
 using R2API.Utils;
 using RoR2;
-using RoR2.Networking;
+//using RoR2.Networking;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
-using Random = System.Random;
+//using Random = System.Random;
 
 namespace blazingdrummer.TemporaryLunarCoins
 {
@@ -29,14 +29,13 @@ namespace blazingdrummer.TemporaryLunarCoins
 
         public void Awake()
         {
-
             ChangeDroprate = Config.Bind("", "ChangeDroprate", true, new ConfigDescription("If this is set to false, it will ignore the other values and use vanilla settings."));
             DropChance = Config.Bind("", "DropChance", 1.5f, new ConfigDescription("The initial value to drop coins. Vanilla is 1 (percent)"));
             DropMulti = Config.Bind("", "DropMulti", 0.5f, new ConfigDescription("The multiplier for which, after every lunar coin is dropped, modifies the current dropchance. Results in diminishing returns. Vanilla  is 0.5 (percent)."));
 
             Run.onRunStartGlobal += delegate(Run run)
             {
-                // TODO: remove this before shipping
+                // TODO: remove logging before release
                 Chat.AddMessage("Stages cleared: " + run.NetworkstageClearCount);
                 // checking if this is a loaded game or not
                 if (run.NetworkstageClearCount <= 0)
@@ -51,10 +50,7 @@ namespace blazingdrummer.TemporaryLunarCoins
                 }
             };
             
-            if (!LoadingFromSave)
-            {
-                On.RoR2.Chat.UserChatMessage.ConstructChatString += UserChatMessage_ConstructChatString;
-            }
+            On.RoR2.Chat.UserChatMessage.ConstructChatString += UserChatMessage_ConstructChatString;
 
             // save file stores run's current coin amount and multiplier value
             // initial drop chance is the initial value of lunarCoinChanceMultiplier and the actual "multiplier" is hard-coded
@@ -67,18 +63,18 @@ namespace blazingdrummer.TemporaryLunarCoins
                 MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Modify(initDelegate, (Action<ILContext>)coinDropHook);
 
                 // the drop chance should not be set back to the config value in the case of a loaded save
-                if (!LoadingFromSave)
-                {
-                    On.RoR2.PlayerCharacterMasterController.Awake += PlayerCharacterMasterController_Awake;
-                }
+                On.RoR2.PlayerCharacterMasterController.Awake += PlayerCharacterMasterController_Awake;
             }
         }
 
         private void PlayerCharacterMasterController_Awake(On.RoR2.PlayerCharacterMasterController.orig_Awake orig, PlayerCharacterMasterController self)
         {
             orig(self);
-            // this sets the initial drop value; overrides the initial value of 0.5f set in PlayerCharacterMasterController()
-            self.SetFieldValue("lunarCoinChanceMultiplier", DropChance.Value);
+            if (!LoadingFromSave)
+            {
+                // this sets the initial drop value; overrides the initial value of 0.5f set in PlayerCharacterMasterController()
+                self.SetFieldValue("lunarCoinChanceMultiplier", DropChance.Value);
+            }
         }
 
         private List<SteamPlayer> PopulateSteamPlayersList()
@@ -94,39 +90,41 @@ namespace blazingdrummer.TemporaryLunarCoins
 
         private string UserChatMessage_ConstructChatString(On.RoR2.Chat.UserChatMessage.orig_ConstructChatString orig, Chat.UserChatMessage self)
         {
-            if (!AllAgree && self.text.ToLower().Equals("agree"))
+            if (!LoadingFromSave)
             {
-                NetworkUser networkUser = self.sender.GetComponent<NetworkUser>();
-                if (networkUser)
+                if (!AllAgree && self.text.ToLower().Equals("agree"))
                 {
-                    var steamID = networkUser.id.steamId;
-                    for (int i = 0; i < SteamPlayers.Count; i++)
+                    NetworkUser networkUser = self.sender.GetComponent<NetworkUser>();
+                    if (networkUser)
                     {
-                        if (SteamPlayers[i].steamID == steamID)
+                        var steamID = networkUser.id.steamId;
+                        for (int i = 0; i < SteamPlayers.Count; i++)
                         {
-                            SteamPlayers[i].isReady = true;
-                            break;
+                            if (SteamPlayers[i].steamID == steamID)
+                            {
+                                SteamPlayers[i].isReady = true;
+                                break;
+                            }
                         }
-                    }
-                    bool checkAllReady = true;
-                    for (int i = 0; i < SteamPlayers.Count; i++)
-                    {
-                        if (!SteamPlayers[i].isReady)
+                        bool checkAllReady = true;
+                        for (int i = 0; i < SteamPlayers.Count; i++)
                         {
-                            checkAllReady = false;
-                            break;
+                            if (!SteamPlayers[i].isReady)
+                            {
+                                checkAllReady = false;
+                                break;
+                            }
                         }
-                    }
-                    if (checkAllReady)
-                    {
-                        //Time.timeScale = 1f;
-                        AllAgree = true;
-                        RemoveLunarCoins();
-                        UnfreezePlayers();
+                        if (checkAllReady)
+                        {
+                            //Time.timeScale = 1f;
+                            AllAgree = true;
+                            RemoveLunarCoins();
+                            UnfreezePlayers();
+                        }
                     }
                 }
             }
-
             return orig(self);
         }
 
@@ -177,12 +175,11 @@ namespace blazingdrummer.TemporaryLunarCoins
                 baseToken = " -- Temporary Lunar Coins --" +
                 "\n<size=15px>If you wish to participate in this run, you need to agree to have your lunar coins reset to 0. Type <color=#00cc00>\"AGREE\"</color> in the chat if you agree. Otherwise, leave the game and keep your coins. The game will resume once everyone present agrees.</size>"
             });
+
             foreach (var p in PlayerCharacterMasterController.instances)
             {
-                var state = p.master.GetBody().gameObject.GetComponent<SetStateOnHurt>();
                 p.master.GetBody().AddBuff(BuffIndex.HiddenInvincibility);
             }
-
 
             while (!AllAgree && Run.instance)
             {
