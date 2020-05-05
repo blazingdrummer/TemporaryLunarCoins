@@ -30,8 +30,8 @@ namespace blazingdrummer.TemporaryLunarCoins
         public void Awake()
         {
             ChangeDroprate = Config.Bind("", "ChangeDroprate", true, new ConfigDescription("If this is set to false, it will ignore the other values and use vanilla settings."));
-            DropChance = Config.Bind("", "DropChance", 1.5f, new ConfigDescription("The initial value to drop coins. Vanilla is 1 (percent)"));
-            DropMulti = Config.Bind("", "DropMulti", 0.5f, new ConfigDescription("The multiplier for which, after every lunar coin is dropped, modifies the current dropchance. Results in diminishing returns. Vanilla  is 0.5 (percent)."));
+            DropChance = Config.Bind("", "DropChance", 2f, new ConfigDescription("The initial value to drop coins. Vanilla is 1 (percent)"));
+            DropMulti = Config.Bind("", "DropMulti", 0.8f, new ConfigDescription("The multiplier for which, after every lunar coin is dropped, modifies the current dropchance. Results in diminishing returns. Vanilla  is 0.5 (percent)."));
 
             Run.onRunStartGlobal += delegate(Run run)
             {
