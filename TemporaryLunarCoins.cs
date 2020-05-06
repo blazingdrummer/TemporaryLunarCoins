@@ -40,6 +40,7 @@ namespace blazingdrummer.TemporaryLunarCoins
                 // checking if this is a loaded game or not
                 if (run.NetworkstageClearCount <= 0)
                 {
+					LoadingFromSave = false;
                     AllAgree = false;
                     SteamPlayers = PopulateSteamPlayersList();
                     StartCoroutine(StartCoinRemovalAgreement());

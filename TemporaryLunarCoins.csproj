@@ -65,7 +65,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y &quot;$(TargetPath)&quot; &quot;C:\Users\Matthew Strobel\AppData\Roaming\r2modmanPlus-local\mods\profiles\Default\BepInEx\plugins\TemporaryLunarCoins.dll&quot;" />
+    <Exec Command="set &quot;pluginsDir=C:\Users\Matthew Strobel\AppData\Roaming\r2modmanPlus-local\mods\profiles\Default\BepInEx\plugins&quot;&#xD;&#xA;if not exist &quot;%25pluginsDir%25&quot; exit&#xD;&#xA;&#xD;&#xA;set &quot;dir=C:\Users\Matthew Strobel\AppData\Roaming\r2modmanPlus-local\mods\profiles\Default\BepInEx\plugins\blazingdrummer-TemporaryLunarCoins\&quot;&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25dir%25&quot; mkdir &quot;%25dir%25&quot;&#xD;&#xA;copy /Y &quot;$(TargetPath)&quot; &quot;%25dir%25&quot;" />
   </Target>
 
 </Project>
